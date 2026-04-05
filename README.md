@@ -1,4 +1,4 @@
-# 🧠 MindVault — Persistent Memory & Identity for AI Agents on 0G
+# MindVault : Persistent Memory & Identity for AI Agents on 0G
 
 > AI agents that remember everything, prove every thought, and own their identity.
 
