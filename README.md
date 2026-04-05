@@ -207,7 +207,7 @@ This project integrates **4 core 0G components**:
 |:---:|:---|:---:|
 | **0G Storage** | Agent memories serialized as JSON, uploaded via `@0gfoundation/0g-ts-sdk` with Merkle proofs. Root hash stored on-chain. Supports upload, download, restore, and cross-agent sharing. | [StorageScan](https://storagescan-galileo.0g.ai) |
 | **0G Compute** | All agent inference via `@0glabs/0g-serving-broker`. TEE-verified (Sealed Inference). Models: Qwen 2.5 7B, DeepSeek V3. On-chain billing. Two-pass memory extraction uses a second inference call. | TEE badge on every message |
-| **0G Chain** | Two Solidity contracts: `MindVaultINFT` (ERC-7857) and `MemoryRegistry`. Supports mint, clone, memory update, snapshot recording. | [ChainScan](https://chainscan.0g.ai) |
+| **0G Chain** | Three Solidity contracts: `MindVaultINFT` (ERC-7857), `MemoryRegistry`, and `AgentMarketplace`. Supports mint, clone, memory update, snapshot recording, and agent trading. | [ChainScan](https://chainscan.0g.ai) |
 | **Agent ID** | Each agent is an ERC-7857 INFT with encrypted config (AES-256-GCM). Supports cloning (inherits personality, fresh memory). Transferable ownership. | `ownerOf()`, `getAgent()`, `cloneAgent()` |
 
 ### Contract Addresses (0G Mainnet)
@@ -285,6 +285,95 @@ Agent B can import Agent A's memories. Reads the source agent's storage root fro
 </td>
 </tr>
 </table>
+
+---
+
+## Agent Marketplace
+
+MindVault includes an on-chain marketplace for trading trained AI agent INFTs. Agents accumulate verified memory histories over time — the marketplace lets you buy, sell, and transfer that intelligence.
+
+### How It Works
+
+```mermaid
+sequenceDiagram
+    participant S as Seller
+    participant M as AgentMarketplace
+    participant I as MindVaultINFT
+    participant B as Buyer
+
+    S->>I: approve(marketplace, tokenId)
+    S->>M: list(tokenId, price)
+    Note over M: Listing stored on-chain<br/>with seller address + price
+
+    B->>M: buy(tokenId) + send 0G payment
+    M->>I: safeTransferFrom(seller, buyer, tokenId)
+    M->>S: Forward payment
+    Note over B: Buyer now owns the INFT<br/>with all memory history intact
+```
+
+### Contract
+
+| Contract | Address | Explorer |
+|:---|:---|:---:|
+| AgentMarketplace | Deploy via `npm run deploy` | Requires INFT address as constructor arg |
+
+The marketplace contract:
+- **list()** — Set a price for your agent INFT (requires ERC721 approval)
+- **delist()** — Remove a listing
+- **buy()** — Purchase a listed agent. Payment goes to seller, INFT transfers to buyer. Excess refunded.
+
+The buyer receives the full INFT — name, encrypted config, storage root pointing to all persisted memories. The agent's verified memory history transfers with ownership.
+
+### Marketplace Tab
+
+The web UI includes a Marketplace tab where you can:
+- See your unlisted agents and set a sale price
+- Browse all active listings with agent name, memory count, storage root, and price
+- Buy agents directly (via server wallet or connected MetaMask)
+- Delist your own agents
+
+---
+
+## Privacy & Security Model
+
+MindVault implements five layers of privacy protection across the stack.
+
+### Security Layers
+
+```mermaid
+flowchart LR
+    A[Plaintext Config] -->|AES-256-GCM| B[Ciphertext On-Chain]
+    B -->|Owner Key Only| C[Decrypted in Browser]
+    C -->|TEE Enclave| D[Sealed Inference]
+    D -->|Merkle Proof| E[Verified Storage]
+    E -->|ownerOf Check| F[Access Controlled]
+
+    style A fill:#7c3aed,color:#fff
+    style B fill:#1a1a2e,stroke:#a78bfa,color:#fff
+    style D fill:#2563eb,color:#fff
+    style E fill:#34d399,color:#000
+    style F fill:#f59e0b,color:#000
+```
+
+| Layer | Protection | Implementation |
+|:---|:---|:---|
+| **Encrypted Config** | Agent personality never stored as plaintext on-chain | AES-256-GCM, key derived from owner's private key + token ID |
+| **TEE Inference** | Compute provider cannot observe prompts or responses | 0G Compute Sealed Inference, hardware enclave isolation |
+| **On-Chain Access Control** | Only INFT owner can update memory or clone | `require(ownerOf(tokenId) == msg.sender)` in every write function |
+| **Merkle-Verified Storage** | Any tampering changes the root hash | Merkle tree construction via 0G SDK, root stored on-chain |
+| **Memory Privacy Boundary** | Memory content not publicly indexed | Content-addressed storage, requires root hash to download |
+
+### Threat Model
+
+| Threat | Mitigation | Status |
+|:---|:---|:---:|
+| Compute provider reads prompts/responses | TEE enclave — provider cannot observe plaintext | Mitigated |
+| On-chain observer reads agent personality | AES-256-GCM encryption — ciphertext only on-chain | Mitigated |
+| Unauthorized memory update | ownerOf() check in smart contract | Mitigated |
+| Memory data tampering in storage | Merkle proof verification — modification changes root hash | Mitigated |
+| Memory content visible via storage root | Root hash is public, content requires explicit download | Partial |
+
+The Privacy tab in the web UI visualizes all five layers with technical details and the full threat model.
 
 ---
 
@@ -405,7 +494,8 @@ Smart contracts enforce ownership via `ownerOf` checks regardless of which walle
 0g-mindvault
 ├── contracts/src/
 │   ├── MindVaultINFT.sol          # ERC-7857 agent identity NFT
-│   └── MemoryRegistry.sol         # On-chain memory snapshot index
+│   ├── MemoryRegistry.sol         # On-chain memory snapshot index
+│   └── AgentMarketplace.sol       # Agent INFT trading marketplace
 ├── agent/
 │   ├── index.ts                   # Core runtime: chat, extract, persist, restore
 │   └── demo.ts                    # Interactive + scripted CLI demo
@@ -419,11 +509,11 @@ Smart contracts enforce ownership via `ownerOf` checks regardless of which walle
 │   ├── plugin.ts                  # OpenClaw plugin: 3 tools + hooks
 │   └── test.ts                    # End-to-end plugin test
 ├── web/
-│   ├── app/page.tsx               # Dashboard, Chat, OpenClaw, Architecture tabs
-│   ├── app/api/                   # REST API: agents, chat, memory, verify, services
+│   ├── app/page.tsx               # Dashboard, Chat, Marketplace, OpenClaw, Privacy, Architecture
+│   ├── app/api/                   # REST API: agents, chat, memory, marketplace, verify, services
 │   └── lib/                       # Contracts, wallet connect, encryption
 ├── scripts/
-│   └── deploy.ts                  # Contract deployment script
+│   └── deploy.ts                  # Contract deployment script (all 3 contracts)
 ├── openclaw.json                  # OpenClaw gateway configuration
 └── hardhat.config.ts              # 0G testnet + mainnet network config
 ```
@@ -452,7 +542,9 @@ Smart contracts enforce ownership via `ownerOf` checks regardless of which walle
 - **"Clone Agent"** on each agent card demonstrates ERC-7857 clone
 - **"Export"** on each agent card downloads portable agent state as JSON
 - **"Connect Wallet"** in header enables MetaMask integration with auto 0G network add
-- Architecture tab shows live 0G Compute service discovery
+- **Marketplace tab** — list agents for sale, browse listings, buy/delist (requires deployed AgentMarketplace contract)
+- **Privacy tab** — visualizes all 5 security layers with technical details and threat model
+- **Architecture tab** shows live 0G Compute service discovery
 
 ---
 
