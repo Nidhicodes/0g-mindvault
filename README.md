@@ -1,149 +1,338 @@
-# MindVault : Persistent Memory & Identity for AI Agents on 0G
+<p align="center">
+  <img src="https://img.shields.io/badge/0G-Mainnet-brightgreen?style=for-the-badge&logo=ethereum" alt="0G Mainnet" />
+  <img src="https://img.shields.io/badge/ERC--7857-INFT-purple?style=for-the-badge" alt="ERC-7857" />
+  <img src="https://img.shields.io/badge/TEE-Verified-blue?style=for-the-badge&logo=shield" alt="TEE Verified" />
+  <img src="https://img.shields.io/badge/OpenClaw-Plugin-orange?style=for-the-badge" alt="OpenClaw" />
+  <img src="https://img.shields.io/badge/Solo_Dev-Built-red?style=for-the-badge" alt="Solo Dev" />
+</p>
 
-> AI agents that remember everything, prove every thought, and own their identity.
+<h1 align="center">MindVault</h1>
+<h3 align="center">Persistent Memory & Identity for AI Agents on 0G</h3>
 
-MindVault is a decentralized agent memory and identity platform built on 0G. AI agents store persistent memories on **0G Storage** (Merkle-verified), run inference through **0G Compute** (TEE-verified), and own their identity as **INFTs (ERC-7857)** on **0G Chain**, transferable, clonable, and truly owned.
+<p align="center">
+  <i>AI agents that remember everything, prove every thought, and own their identity.</i>
+</p>
+
+<p align="center">
+  <a href="https://chainscan.0g.ai/address/0xcfee7588d1C396fa76d1D7f6f2BBC50153775785">INFT Contract</a> · 
+  <a href="https://chainscan.0g.ai/address/0xd0565f93f450494e8373dE7f33d565E0B5b41089">Registry Contract</a> · 
+  <a href="https://storagescan-galileo.0g.ai">StorageScan</a>
+</p>
+
+---
+
+> MindVault is a decentralized agent memory and identity platform built on 0G. AI agents store persistent memories on **0G Storage** (Merkle-verified), run inference through **0G Compute** (TEE-verified), and own their identity as **INFTs (ERC-7857)** on **0G Chain** transferable, clonable, and truly owned.
+
+---
 
 ## The Problem
 
-Today's AI agents are stateless. Every session starts from zero i.e., no memory of past conversations, no learning from experience, no proof of reasoning. When you "own" an AI agent, you don't really own anything. The intelligence lives on someone else's server, and the memories vanish when the session ends.
+Today's AI agents are **stateless**. Every session starts from zero no memory of past conversations, no learning from experience, no proof of reasoning. When you "own" an AI agent, you don't really own anything. The intelligence lives on someone else's server, and the memories vanish when the session ends.
+
+```
+Session 1: "I'm building a DeFi protocol on 0G"
+Session 2: "Who are you? I don't know anything about you."  ← This is broken.
+```
 
 ## The Solution
 
 MindVault gives AI agents three things they've never had:
 
-1. **Persistent Memory** — Memories extracted from conversations, stored on 0G Storage with Merkle proofs, and restored across sessions
-2. **Verifiable Reasoning** — Every inference runs through 0G Compute with TEE (Sealed Inference) verification
-3. **Tokenized Identity** — Each agent is an ERC-7857 INFT on 0G Chain, mintable, clonable, transferable, with encrypted config stored on-chain
-4. **Cross-Agent Memory Sharing** — Agents can import memories from other agents, enabling composable intelligence
-5. **OpenClaw Plugin** — 3 tools + hooks that let any OpenClaw gateway use MindVault for persistent memory
+| Capability | What It Does | 0G Component |
+|:---:|:---|:---:|
+| **Persistent Memory** | Memories extracted, Merkle-verified, restored across sessions | 0G Storage |
+| **Verifiable Reasoning** | Every inference TEE-verified via Sealed Inference | 0G Compute |
+| **Tokenized Identity** | Each agent is an ERC-7857 INFT  mintable, clonable, transferable | 0G Chain |
+| **Memory Sharing** | Agents import memories from other agents | 0G Storage + Chain |
+| **OpenClaw Plugin** | 3 tools + hooks for any OpenClaw gateway | OpenClaw SDK |
 
-## Why This Matters : Market & Vision
-
-### The Market
-
-The AI agent market is projected to reach $47B by 2030. Every major framework (LangChain, AutoGPT, CrewAI) treats memory as an afterthought, in-process, ephemeral, unverifiable. As agents move from toys to production (trading, customer service, personal assistants), three problems become critical:
-
-1. **Memory loss** — Agents forget everything between sessions. Users repeat themselves. Context is lost.
-2. **Trust deficit** — No way to prove what an agent said or why. Black-box reasoning can't be audited.
-3. **No ownership** — You can't transfer, sell, or compose agent intelligence. It's locked in a platform.
-
-### Who Needs This
-
-- **Agent framework developers** — Integrate MindVault via OpenClaw plugin to add persistent memory to any agent without building storage infrastructure
-- **DeFi/trading teams** — Agents that remember market patterns across sessions, with TEE-verified reasoning for audit trails
-- **AI-native dApps** — Personal assistants, tutors, companions that build long-term relationships with users
-- **Agent marketplace builders** — INFTs enable a secondary market for trained agents, buy an agent that already knows your domain
-
-### Competitive Landscape
-
-| Approach | Memory | Verifiable | Owned | Decentralized |
-|----------|--------|-----------|-------|---------------|
-| ChatGPT Memory | ✓ | ✗ | ✗ | ✗ |
-| LangChain + Pinecone | ✓ | ✗ | ✗ | ✗ |
-| Mem0 | ✓ | ✗ | ✗ | ✗ |
-| **MindVault on 0G** | **✓** | **✓ (TEE)** | **✓ (INFT)** | **✓** |
-
-MindVault is the only solution that combines persistent memory, verifiable inference, tokenized ownership, and decentralized storage in a single stack, all on 0G.
-
-### Growth Path
-
-- **Phase 1 (now)**: Core infrastructure — memory persistence, verifiable inference, agent identity, OpenClaw plugin
-- **Phase 2**: Agent marketplace — trade trained INFTs, memory licensing, cross-platform agent portability
-- **Phase 3**: Agent economy — agents that hire other agents, pay for compute with earned revenue, autonomous organizations with verifiable decision trails
-
-### Imagine This
-
-- A **customer support agent** that remembers every interaction across 10,000 sessions. When an employee leaves, the company transfers the INFT to their replacement, institutional knowledge preserved, verified, owned.
-- An **agent marketplace** where you buy a "Senior Solidity Auditor" INFT with 500 verified memories of past audits. The memory history is on-chain, you can verify what it knows before you buy.
-- A **gaming NPC** with persistent memory that evolves based on player interactions. It remembers alliances, betrayals, and promises — and the game studio can prove the NPC's reasoning was TEE-verified, not scripted.
-- A **DeFi trading agent** that accumulates market pattern memories over months. Its INFT becomes more valuable as its verified memory history grows, a new asset class.
-- An **AI tutor** that remembers a student's learning style, weak areas, and progress across semesters. The student owns the INFT and can export their agent to any platform.
-
+---
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    MindVault Explorer (Next.js)               │
-│    Dashboard · Chat · Memory Viewer · OpenClaw · Architecture │
-└──────────┬────────────────────────────────┬──────────────────┘
-           │  API Routes                    │
-    ┌──────▼──────────────┐      ┌─────────▼──────────────────┐
-    │   Agent Runtime     │      │   INFT Manager (ERC-7857)  │
-    │   chat → extract    │      │   mint · clone · transfer  │
-    │   persist → restore │      │   encrypted config on-chain│
-    │   share memories    │      │   memory root tracking     │
-    └──────┬──────┬───────┘      └─────────┬──────────────────┘
-           │      │                        │
-    ┌──────▼──┐ ┌─▼──────────┐   ┌────────▼──────────────────┐
-    │0G Store │ │0G Compute  │   │0G Chain                   │
-    │ Merkle  │ │ TEE Verify │   │ MindVaultINFT (ERC-7857)  │
-    │ Proofs  │ │ Sealed Inf │   │ MemoryRegistry            │
-    │ JSON    │ │ Qwen/DS V3 │   │ Snapshot history          │
-    └─────────┘ └────────────┘   └────────────────────────────┘
+### System Overview
 
-    OpenClaw Plugin Layer:
-    ├─ mindvault_store_memory  → 0G Storage + Chain update
-    ├─ mindvault_recall_memory → Chain lookup + 0G Storage download
-    ├─ mindvault_get_agent     → Chain INFT metadata read
-    └─ agent_end hook          → Auto-checkpoint on session end
+```mermaid
+graph TB
+    subgraph Frontend["MindVault Explorer - Next.js"]
+        UI[Dashboard · Chat · OpenClaw · Architecture]
+        API[API Routes]
+    end
+
+    subgraph Runtime["Agent Runtime"]
+        Chat[Chat Engine]
+        Extract[Two-Pass Memory Extraction]
+        Relevance[Semantic Relevance Scoring]
+        Conflict[Conflict Resolution]
+    end
+
+    subgraph Identity["INFT Manager"]
+        Mint[Mint Agent]
+        Clone[Clone Agent]
+        Encrypt[AES-256-GCM Encryption]
+    end
+
+    subgraph ZeroG["0G Infrastructure"]
+        Storage[(0G Storage<br/>Merkle Proofs)]
+        Compute[0G Compute<br/>TEE Verified]
+        Chain[0G Chain<br/>ERC-7857 + Registry]
+    end
+
+    subgraph Plugin["OpenClaw Plugin"]
+        Tools[3 Tools + Hooks]
+    end
+
+    UI --> API
+    API --> Chat
+    Chat --> Extract
+    Extract --> Relevance
+    Extract --> Conflict
+    Chat --> Compute
+    API --> Mint
+    API --> Clone
+    Mint --> Encrypt
+    Encrypt --> Chain
+    Extract --> Storage
+    Storage --> Chain
+    Tools --> Storage
+    Tools --> Chain
+
+    style Frontend fill:#1a1a2e,stroke:#a78bfa,color:#fff
+    style Runtime fill:#1a1a2e,stroke:#34d399,color:#fff
+    style Identity fill:#1a1a2e,stroke:#f59e0b,color:#fff
+    style ZeroG fill:#0f0f12,stroke:#60a5fa,color:#fff
+    style Plugin fill:#1a1a2e,stroke:#f97316,color:#fff
 ```
+
+### Data Flow : Chat to Persistence
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant W as Web UI
+    participant C as 0G Compute (TEE)
+    participant S as 0G Storage
+    participant B as 0G Chain
+
+    U->>W: Send message
+    W->>B: Load agent INFT metadata
+    B-->>W: storageRoot, encryptedConfig
+    W->>S: Download memories (Merkle root)
+    S-->>W: Memory[] (verified)
+    
+    Note over W: Select top-20 relevant memories<br/>(TF-IDF scoring + recency)
+    
+    W->>C: Inference (prompt + memories)
+    C-->>W: Response + TEE proof
+    
+    Note over W: Two-pass memory extraction<br/>Pass 1: [MEMORY] tags<br/>Pass 2: JSON extraction via 0G Compute
+    Note over W: Conflict resolution<br/>(supersede contradictions)
+    
+    W->>S: Upload memories (Merkle tree)
+    S-->>W: rootHash + txHash
+    W->>B: INFT.updateMemory(rootHash)
+    W->>B: Registry.recordSnapshot()
+    
+    W-->>U: Response + TEE badge + memories
+```
+
+### Memory Intelligence Pipeline
+
+```mermaid
+flowchart LR
+    A[Chat Message] --> B{Pass 1<br/>Tag Extraction}
+    B -->|Found| D[Classify & Deduplicate]
+    B -->|Empty| C{Pass 2<br/>0G Compute JSON}
+    C --> D
+    D --> E{Conflict<br/>Detection}
+    E -->|Contradiction| F[Supersede Old Memory]
+    E -->|No Conflict| G[Add to Memory Store]
+    F --> G
+    G --> H{Relevance<br/>Scoring}
+    H --> I[Top-20 for Next Prompt]
+    
+    style A fill:#7c3aed,color:#fff
+    style C fill:#2563eb,color:#fff
+    style F fill:#f59e0b,color:#000
+    style I fill:#34d399,color:#000
+```
+
+### Smart Contract Architecture
+
+```mermaid
+classDiagram
+    class MindVaultINFT {
+        +ERC721 + IERC7857
+        +mintAgent(name, encryptedConfig) uint256
+        +updateMemory(tokenId, storageRoot, kvStreamId)
+        +cloneAgent(originalId) uint256
+        +getAgent(tokenId) AgentMetadata
+        +supportsInterface(interfaceId) bool
+    }
+    
+    class MemoryRegistry {
+        +setWriter(agentId, writer)
+        +recordSnapshot(agentId, storageRoot, memoryCount)
+        +getLatestSnapshot(agentId) MemorySnapshot
+        +getSnapshotCount(agentId) uint256
+    }
+    
+    class AgentMetadata {
+        +string name
+        +string storageRoot
+        +string kvStreamId
+        +string encryptedConfig
+        +uint256 createdAt
+        +uint256 updatedAt
+    }
+    
+    class MemorySnapshot {
+        +string storageRoot
+        +uint256 timestamp
+        +uint256 memoryCount
+    }
+    
+    MindVaultINFT --> AgentMetadata : stores
+    MemoryRegistry --> MemorySnapshot : stores
+    MindVaultINFT ..> MemoryRegistry : rootHash sync
+```
+
+---
 
 ## 0G Integration Proof
 
 This project integrates **4 core 0G components**:
 
 | Component | How It's Used | Verification |
-|-----------|--------------|--------------|
-| **0G Storage** | Agent memories serialized as JSON, uploaded via `@0gfoundation/0g-ts-sdk` with Merkle proofs. Root hash stored on-chain. Supports upload, download, restore, and cross-agent sharing. | [StorageScan](https://storagescan-galileo.0g.ai) — search by root hash |
-| **0G Compute** | All agent inference via `@0glabs/0g-serving-broker`. TEE-verified (Sealed Inference). Models: Qwen 2.5 7B, DeepSeek V3. On-chain billing. Two-pass memory extraction uses a second inference call for structured JSON extraction. | TEE verification badge on every chat message |
-| **0G Chain** | Two Solidity contracts deployed: `MindVaultINFT` (ERC-7857 agent identity) and `MemoryRegistry` (snapshot history). Supports mint, clone, memory update, snapshot recording. | [ChainScan](https://chainscan-galileo.0g.ai) — contract addresses below |
-| **Agent ID (INFT)** | Each agent is an ERC-7857 Intelligent NFT with encrypted config (AES-256-GCM). Supports cloning (inherits personality, fresh memory). Transferable ownership of AI intelligence. | `ownerOf()`, `getAgent()`, `cloneAgent()` on-chain |
+|:---:|:---|:---:|
+| **0G Storage** | Agent memories serialized as JSON, uploaded via `@0gfoundation/0g-ts-sdk` with Merkle proofs. Root hash stored on-chain. Supports upload, download, restore, and cross-agent sharing. | [StorageScan](https://storagescan-galileo.0g.ai) |
+| **0G Compute** | All agent inference via `@0glabs/0g-serving-broker`. TEE-verified (Sealed Inference). Models: Qwen 2.5 7B, DeepSeek V3. On-chain billing. Two-pass memory extraction uses a second inference call. | TEE badge on every message |
+| **0G Chain** | Two Solidity contracts: `MindVaultINFT` (ERC-7857) and `MemoryRegistry`. Supports mint, clone, memory update, snapshot recording. | [ChainScan](https://chainscan.0g.ai) |
+| **Agent ID** | Each agent is an ERC-7857 INFT with encrypted config (AES-256-GCM). Supports cloning (inherits personality, fresh memory). Transferable ownership. | `ownerOf()`, `getAgent()`, `cloneAgent()` |
 
-### Contract Addresses
+### Contract Addresses (0G Mainnet)
 
-| Contract | Network | Address |
-|----------|---------|---------|
-| MindVaultINFT | 0G Mainnet | `0xcfee7588d1C396fa76d1D7f6f2BBC50153775785` |
-| MemoryRegistry | 0G Mainnet | `0xd0565f93f450494e8373dE7f33d565E0B5b41089` |
+| Contract | Address | Explorer |
+|:---|:---|:---:|
+| MindVaultINFT | `0xcfee7588d1C396fa76d1D7f6f2BBC50153775785` | [View](https://chainscan.0g.ai/address/0xcfee7588d1C396fa76d1D7f6f2BBC50153775785) |
+| MemoryRegistry | `0xd0565f93f450494e8373dE7f33d565E0B5b41089` | [View](https://chainscan.0g.ai/address/0xd0565f93f450494e8373dE7f33d565E0B5b41089) |
 
-> **Explorer links:**
-> - INFT: https://chainscan.0g.ai/address/0xcfee7588d1C396fa76d1D7f6f2BBC50153775785
-> - Registry: https://chainscan.0g.ai/address/0xd0565f93f450494e8373dE7f33d565E0B5b41089
+> Testnet contracts also deployed at the same addresses on 0G Testnet (chain ID 16602).
 
-Testnet contracts are also deployed at the same addresses on 0G Testnet (chain ID 16602).
+---
 
 ## Key Features
 
+<table>
+<tr>
+<td width="50%">
+
 ### Two-Pass Memory Extraction
 Unlike simple keyword parsing, MindVault uses a two-pass approach:
-- **Pass 1**: Normal chat response with `[MEMORY]:` tag extraction
-- **Pass 2**: If Pass 1 finds nothing, a second 0G Compute inference call extracts structured JSON memories from the conversation
+- **Pass 1**: Chat response with `[MEMORY]:` tag extraction
+- **Pass 2**: If Pass 1 finds nothing, a second 0G Compute inference call extracts structured JSON memories
 
-This makes memory extraction reliable regardless of model output format.
+Works regardless of model output format.
 
-### Cross-Session Memory Persistence
-Agents remember across sessions. The "Restore from 0G" button in the chat sidebar loads an agent's existing memories from 0G Storage (via the on-chain Merkle root) into the current session.
+</td>
+<td width="50%">
 
-### Cross-Agent Memory Sharing
-Agent B can import Agent A's memories. The UI provides an "Import from…" dropdown that reads the source agent's storage root from the INFT contract, downloads memories from 0G Storage, and injects them into the current session.
+### Semantic Memory Retrieval
+Not all memories are equal. When an agent has 200+ memories, MindVault uses TF-IDF-like relevance scoring to select the top-20 most relevant memories for the current conversation, plus the 5 most recent. The prompt shows `"15/200 most relevant"` instead of dumping everything.
+
+</td>
+</tr>
+<tr>
+<td>
+
+### Memory Conflict Resolution
+When a user says "I moved to Tokyo" but the agent remembers "User lives in Berlin," MindVault detects the contradiction by subject overlap analysis and supersedes the old memory. No stale data.
+
+</td>
+<td>
 
 ### Sealed Inference Proof Cards
-Every chat message shows a verification proof card with the Chat ID, TEE verification status, model used, and latency. This maps directly to 0G's Sealed Inference feature.
+Every chat message shows a verification proof card with Chat ID, TEE verification status, model used, and latency. Maps directly to 0G's Sealed Inference feature.
 
-### Memory Verification
-A "Verify Proof" button downloads memories from 0G Storage using the root hash, confirms the data is intact, and reports the memory count, proving the Merkle proof chain is valid.
+</td>
+</tr>
+<tr>
+<td>
 
 ### Agent Cloning (ERC-7857)
-Clone an agent on-chain. The new INFT inherits the original's encrypted personality config but starts with fresh memory — demonstrating composable agent identity.
+Clone an agent on-chain. The new INFT inherits the original's encrypted personality config but starts with fresh memory, composable agent identity.
 
-### Memory Timeline
-Visual timeline showing how an agent's knowledge grows over time, with snapshot timestamps, memory counts, and storage roots.
+</td>
+<td>
+
+### Agent Export/Import
+Full JSON export with metadata, snapshots, and memories downloaded from 0G Storage. Portable agent state — not locked into any platform.
+
+</td>
+</tr>
+<tr>
+<td>
+
+### Cross-Agent Memory Sharing
+Agent B can import Agent A's memories. Reads the source agent's storage root from the INFT contract, downloads from 0G Storage, and injects into the current session.
+
+</td>
+<td>
 
 ### OpenClaw Plugin
-3 registered tools (`mindvault_store_memory`, `mindvault_recall_memory`, `mindvault_get_agent`) + `agent_end` session hook. Any OpenClaw gateway can use MindVault for persistent memory without modification.
+3 registered tools (`mindvault_store_memory`, `mindvault_recall_memory`, `mindvault_get_agent`) + `agent_end` auto-persist hook. Any OpenClaw gateway gets persistent memory.
 
+</td>
+</tr>
+</table>
+
+---
+
+## Why This Matters : Market & Vision
+
+### The Market
+
+The AI agent market is projected to reach **$47B by 2030**. Every major framework (LangChain, AutoGPT, CrewAI) treats memory as an afterthought, in-process, ephemeral, unverifiable.
+
+### Competitive Landscape
+
+| Approach | Memory | Verifiable | Owned | Decentralized | Composable |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| ChatGPT Memory | Yes | No | No | No | No |
+| LangChain + Pinecone | Yes | No | No | No | No |
+| Mem0 | Yes | No | No | No | No |
+| **MindVault on 0G** | **Yes** | **Yes (TEE)** | **Yes (INFT)** | **Yes** | **Yes** |
+
+### Growth Path
+
+```mermaid
+timeline
+    title MindVault Roadmap
+    Phase 1 - Now : Memory persistence
+                  : Verifiable inference
+                  : Agent identity via INFT
+                  : OpenClaw plugin
+    Phase 2       : Agent marketplace
+                  : Trade trained INFTs
+                  : Memory licensing
+                  : Cross-platform portability
+    Phase 3       : Agent economy
+                  : Agents hire agents
+                  : Revenue-earning agents
+                  : Verifiable decision trails
+```
+
+### Use Cases
+
+| Scenario | How MindVault Helps |
+|:---|:---|
+| **Enterprise Support** | Agent remembers 10,000 sessions. Employee leaves, transfer INFT, institutional knowledge preserved. |
+| **Agent Marketplace** | Buy a "Senior Solidity Auditor" INFT with 500 verified memories. Verify what it knows before you buy. |
+| **Gaming NPCs** | Persistent memory that evolves with player interactions. TEE-verified reasoning, not scripted. |
+| **DeFi Trading** | Agent accumulates market pattern memories. INFT value grows with verified memory history. |
+| **AI Tutoring** | Remembers learning style, weak areas, progress across semesters. Student owns the INFT. |
+
+---
 
 ## Quick Start
 
@@ -158,10 +347,10 @@ git clone https://github.com/sqnidhi/0g-mindvault
 cd 0g-mindvault
 npm install
 cp .env.example .env
-# Edit .env — add your PRIVATE_KEY
+# Edit .env, add your PRIVATE_KEY
 ```
 
-### Deploy Contracts (or use existing testnet addresses)
+### Deploy Contracts (or use existing addresses)
 
 ```bash
 npx hardhat compile
@@ -169,101 +358,115 @@ npx tsx scripts/deploy.ts
 # Copy output addresses to .env
 ```
 
-The testnet contracts are already deployed and functional. You can use the addresses in `.env.example` to skip deployment.
+> Mainnet and testnet contracts are already deployed. Use the addresses in `.env.example` to skip deployment.
 
-### Run the CLI Demo
+### Run
 
 ```bash
-# Interactive mode — mint agent, chat, persist memories
+# CLI Demo (interactive or scripted)
 npm run demo
-
-# Scripted mode — automated demo for recording
 npm run demo:scripted
-```
 
-### Run the Web UI
+# Web UI
+npm run dev          # http://localhost:3000
 
-```bash
-npm run dev
-# Open http://localhost:3000
-```
-
-### Test Individual Components
-
-```bash
-# Test 0G Storage integration
+# Test individual components
 npm run test:storage
-
-# Test 0G Compute integration
 npm run test:compute
-
-# Test OpenClaw plugin end-to-end
 npm run test:openclaw
 ```
 
-### Architecture Note: Wallet Model
+### Wallet Model
+
 The web UI supports both modes:
-- **Connected wallet (MetaMask)** — On-chain operations (mint, clone) go through the user's browser wallet. The user truly owns their agent INFTs. A "Connect Wallet" button in the header auto-adds the 0G network to MetaMask.
-- **Server wallet (fallback)** — If no wallet is connected, on-chain operations use the server-side key for a frictionless demo experience. Storage uploads and compute inference always use the server wallet (0G SDKs are Node.js only).
 
-The smart contracts enforce ownership via `ownerOf` checks — regardless of which wallet mints, only the owner can update memory or clone.
+```mermaid
+flowchart LR
+    U[User] --> W{Wallet<br/>Connected?}
+    W -->|Yes| MM[MetaMask<br/>True ownership]
+    W -->|No| SV[Server Wallet<br/>Frictionless demo]
+    MM --> Chain[0G Chain]
+    SV --> Chain
+    
+    style MM fill:#34d399,color:#000
+    style SV fill:#f59e0b,color:#000
+```
 
+- **Connected wallet (MetaMask)** : On-chain operations go through the user's browser wallet. True INFT ownership. Auto-adds 0G network.
+- **Server wallet (fallback)**: Frictionless demo experience. Storage uploads and compute inference always use the server wallet (0G SDKs are Node.js only).
 
-- The web UI connects to 0G testnet by default. All on-chain operations are real.
-- Chat requires an active 0G Compute provider. If none are available, the demo falls back to storage-only mode.
-- The "Restore from 0G" button in the chat sidebar demonstrates cross-session persistence.
-- The "Import from…" dropdown demonstrates cross-agent memory sharing.
-- The "Verify Proof" button after persisting demonstrates Merkle proof verification.
-- Agent cloning is available on each agent card in the Dashboard tab.
-- The Architecture tab shows live 0G Compute service discovery.
+Smart contracts enforce ownership via `ownerOf` checks regardless of which wallet mints.
+
+---
 
 ## Project Structure
 
 ```
+0g-mindvault
 ├── contracts/src/
-│   ├── MindVaultINFT.sol        # ERC-7857 agent identity NFT
-│   └── MemoryRegistry.sol       # On-chain memory snapshot index
+│   ├── MindVaultINFT.sol          # ERC-7857 agent identity NFT
+│   └── MemoryRegistry.sol         # On-chain memory snapshot index
 ├── agent/
-│   ├── index.ts                 # Core runtime: chat, extract, persist, restore
-│   └── demo.ts                  # Interactive + scripted CLI demo
+│   ├── index.ts                   # Core runtime: chat, extract, persist, restore
+│   └── demo.ts                    # Interactive + scripted CLI demo
 ├── compute/
-│   └── index.ts                 # 0G Compute inference with TEE verification
+│   └── index.ts                   # 0G Compute inference with TEE verification
 ├── storage/
-│   └── index.ts                 # 0G Storage upload/download with Merkle proofs
+│   └── index.ts                   # 0G Storage upload/download with Merkle proofs
 ├── lib/
-│   └── crypto.ts                # AES-256-GCM encryption for agent configs
+│   └── crypto.ts                  # AES-256-GCM encryption for agent configs
 ├── openclaw/
-│   ├── plugin.ts                # OpenClaw plugin: 3 tools + hooks
-│   └── test.ts                  # End-to-end plugin test
+│   ├── plugin.ts                  # OpenClaw plugin: 3 tools + hooks
+│   └── test.ts                    # End-to-end plugin test
 ├── web/
-│   ├── app/page.tsx             # Dashboard, Chat, OpenClaw, Architecture tabs
-│   └── app/api/                 # REST API: agents, chat, memory, verify, services
+│   ├── app/page.tsx               # Dashboard, Chat, OpenClaw, Architecture tabs
+│   ├── app/api/                   # REST API: agents, chat, memory, verify, services
+│   └── lib/                       # Contracts, wallet connect, encryption
 ├── scripts/
-│   └── deploy.ts                # Contract deployment script
-├── openclaw.json                # OpenClaw gateway configuration
-└── hardhat.config.ts            # 0G testnet + mainnet network config
+│   └── deploy.ts                  # Contract deployment script
+├── openclaw.json                  # OpenClaw gateway configuration
+└── hardhat.config.ts              # 0G testnet + mainnet network config
 ```
 
 ## Tech Stack
 
-- **Smart Contracts**: Solidity 0.8.28, Hardhat, OpenZeppelin (ERC721, Ownable)
-- **Agent Runtime**: TypeScript, Node.js, ethers.js v6
-- **0G Storage**: `@0gfoundation/0g-ts-sdk` — Merkle proofs, upload/download
-- **0G Compute**: `@0glabs/0g-serving-broker` — TEE-verified inference, service discovery
-- **Frontend**: Next.js 14, React 18, CSS custom properties (no Tailwind dependency)
-- **Encryption**: AES-256-GCM for on-chain agent config
-- **Chain**: 0G Testnet (16602) / Mainnet (16661)
+| Layer | Technology |
+|:---|:---|
+| Smart Contracts | Solidity 0.8.28, Hardhat, OpenZeppelin (ERC721, Ownable) |
+| Agent Runtime | TypeScript, Node.js, ethers.js v6 |
+| 0G Storage | `@0gfoundation/0g-ts-sdk` — Merkle proofs, upload/download |
+| 0G Compute | `@0glabs/0g-serving-broker` — TEE-verified inference, service discovery |
+| Frontend | Next.js 14, React 18, CSS custom properties |
+| Encryption | AES-256-GCM for on-chain agent config |
+| Chain | 0G Mainnet (16661) / Testnet (16602) |
+
+---
+
+## Reviewer Notes
+
+- The web UI connects to 0G mainnet by default. All on-chain operations are real.
+- Chat requires an active 0G Compute provider. If none are available, the UI shows "Compute Offline" and falls back to storage-only mode.
+- **"Restore from 0G"** in the chat sidebar demonstrates cross-session persistence
+- **"Import from..."** dropdown demonstrates cross-agent memory sharing
+- **"Verify Proof"** button after persisting demonstrates Merkle proof verification
+- **"Clone Agent"** on each agent card demonstrates ERC-7857 clone
+- **"Export"** on each agent card downloads portable agent state as JSON
+- **"Connect Wallet"** in header enables MetaMask integration with auto 0G network add
+- Architecture tab shows live 0G Compute service discovery
+
+---
 
 ## Team
 
-- **Nidhicodes** 
-
+**Nidhicodes** 
 ## License
 
 MIT
 
 ---
 
-Built for the [0G APAC Hackathon 2026](https://www.hackquest.io/hackathons/0G-APAC-Hackathon)
-
-#0GHackathon #BuildOn0G
+<p align="center">
+  Built for the <a href="https://www.hackquest.io/hackathons/0G-APAC-Hackathon">0G APAC Hackathon 2026</a>
+  <br/>
+  <b>#0GHackathon #BuildOn0G</b>
+</p>
