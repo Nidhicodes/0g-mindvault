@@ -2,7 +2,6 @@
 
 import "./globals.css";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { INFT_ADDRESS, REGISTRY_ADDRESS, EXPLORER_URL, STORAGE_SCAN_URL } from "../lib/contracts";
 import { hasWallet, connectWallet, mintAgentWithWallet, cloneAgentWithWallet } from "../lib/wallet";
 import { NETWORKS, DEFAULT_NETWORK, type NetworkConfig } from "../lib/networks";
 
