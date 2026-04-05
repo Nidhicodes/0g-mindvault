@@ -853,10 +853,306 @@ function ArchTab() {
 
 
 /* ══════════════════════════════════════════════
+   MARKETPLACE
+   ══════════════════════════════════════════════ */
+interface MarketListing {
+  tokenId: number; seller: string; price: string; priceWei: string;
+  name: string; storageRoot: string; createdAt: number;
+}
+
+function MarketplaceTab({ agents, addToast, userWallet, onRefresh }: {
+  agents: AgentData[]; addToast: (m: string, t: "success" | "error") => void; userWallet: string | null; onRefresh: () => void;
+}) {
+  const [listings, setListings] = useState<MarketListing[]>([]);
+  const [enabled, setEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [listModal, setListModal] = useState<number | null>(null);
+  const [listPrice, setListPrice] = useState("0.01");
+  const [acting, setActing] = useState<string | null>(null);
+
+  const loadListings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/marketplace");
+      const data = await res.json();
+      setListings(data.listings || []);
+      setEnabled(data.enabled || false);
+    } catch { /* ignore */ }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { loadListings(); }, [loadListings]);
+
+  const doList = async (tokenId: number) => {
+    setActing(`list-${tokenId}`);
+    try {
+      const res = await fetch("/api/marketplace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "list", tokenId, price: listPrice }) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      addToast(`Agent #${tokenId} listed for ${listPrice} 0G`, "success");
+      setListModal(null);
+      loadListings();
+    } catch (e: unknown) { addToast(e instanceof Error ? e.message : "List failed", "error"); }
+    finally { setActing(null); }
+  };
+
+  const doDelist = async (tokenId: number) => {
+    setActing(`delist-${tokenId}`);
+    try {
+      const res = await fetch("/api/marketplace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "delist", tokenId }) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      addToast(`Agent #${tokenId} delisted`, "success");
+      loadListings();
+    } catch (e: unknown) { addToast(e instanceof Error ? e.message : "Delist failed", "error"); }
+    finally { setActing(null); }
+  };
+
+  const doBuy = async (tokenId: number) => {
+    setActing(`buy-${tokenId}`);
+    try {
+      const res = await fetch("/api/marketplace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "buy", tokenId }) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      addToast(`Purchased agent #${tokenId}`, "success");
+      loadListings();
+      onRefresh();
+    } catch (e: unknown) { addToast(e instanceof Error ? e.message : "Buy failed", "error"); }
+    finally { setActing(null); }
+  };
+
+  const listedIds = new Set(listings.map(l => l.tokenId));
+  const myUnlisted = agents.filter(a => !listedIds.has(a.tokenId));
+
+  if (!enabled) {
+    return (
+      <div className="fade-in">
+        <Card style={{ textAlign: "center", padding: "48px 20px" }}>
+          <div style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-0)", marginBottom: 8 }}>Agent Marketplace</div>
+          <div style={{ color: "var(--text-2)", fontSize: "0.85rem", marginBottom: 16, lineHeight: 1.6 }}>
+            Trade trained AI agent INFTs with verified memory histories.<br/>
+            Deploy the AgentMarketplace contract and set MARKETPLACE_ADDRESS in .env to enable.
+          </div>
+          <code className="mono" style={{ padding: "8px 16px", background: "var(--bg-2)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", fontSize: "0.75rem" }}>npm run deploy</code>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fade-in">
+      <Card style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ width: 44, height: 44, borderRadius: "var(--radius)", background: "linear-gradient(135deg, #34d399, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-0)" }}>Agent Marketplace</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--text-2)", marginTop: 3, lineHeight: 1.5 }}>Buy and sell trained AI agent INFTs. Each agent carries verified memory history and encrypted personality on-chain.</div>
+        </div>
+        <Badge variant="green"><Dot /> {listings.length} Listed</Badge>
+      </Card>
+
+      {/* List an agent */}
+      <SectionLabel>Your Agents</SectionLabel>
+      {myUnlisted.length === 0 && listings.length === 0 ? (
+        <Card style={{ textAlign: "center", padding: "32px 20px", marginBottom: 20 }}>
+          <div style={{ color: "var(--text-2)", fontSize: "0.85rem" }}>No agents to list. Mint one from the Dashboard tab.</div>
+        </Card>
+      ) : myUnlisted.length > 0 ? (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 24 }}>
+          {myUnlisted.map(a => (
+            <Card key={a.tokenId} style={{ padding: 14 }}>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-0)", marginBottom: 4 }}>{a.name}</div>
+              <div style={{ fontSize: "0.7rem", color: "var(--text-3)", marginBottom: 8 }}>#{a.tokenId} · {a.snapshots.length > 0 ? `${a.snapshots[a.snapshots.length - 1].memoryCount} memories` : "No memories"}</div>
+              {listModal === a.tokenId ? (
+                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  <input value={listPrice} onChange={e => setListPrice(e.target.value)} placeholder="Price in 0G"
+                    style={{ flex: 1, padding: "5px 8px", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", color: "var(--text-0)", fontSize: "0.75rem", outline: "none" }} />
+                  <Btn onClick={() => doList(a.tokenId)} disabled={acting !== null} style={{ padding: "5px 10px", fontSize: "0.7rem" }}>
+                    {acting === `list-${a.tokenId}` ? "..." : "Confirm"}
+                  </Btn>
+                  <Btn variant="ghost" onClick={() => setListModal(null)} style={{ padding: "5px 8px", fontSize: "0.7rem" }}>X</Btn>
+                </div>
+              ) : (
+                <Btn variant="secondary" onClick={() => setListModal(a.tokenId)} style={{ width: "100%", fontSize: "0.75rem", padding: "5px 0" }}>List for Sale</Btn>
+              )}
+            </Card>
+          ))}
+        </div>
+      ) : null}
+
+      {/* Active listings */}
+      <SectionLabel>For Sale ({listings.length})</SectionLabel>
+      {loading ? (
+        <div style={{ textAlign: "center", padding: 40, color: "var(--text-3)", fontSize: "0.8rem" }}>Loading listings...</div>
+      ) : listings.length === 0 ? (
+        <Card style={{ textAlign: "center", padding: "32px 20px" }}>
+          <div style={{ color: "var(--text-2)", fontSize: "0.85rem" }}>No agents listed for sale yet. Be the first.</div>
+        </Card>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {listings.map(l => (
+            <Card key={l.tokenId} className="slide-up" style={{ padding: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                <div>
+                  <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-0)" }}>{l.name}</div>
+                  <div style={{ fontSize: "0.7rem", color: "var(--text-3)", marginTop: 2 }}>#{l.tokenId} · Seller: <span className="mono">{sh(l.seller, 4)}</span></div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--green)" }}>{l.price} 0G</div>
+                  <Badge variant="green">For Sale</Badge>
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
+                <div style={{ padding: "5px 8px", background: "var(--bg-2)", borderRadius: "var(--radius-sm)", fontSize: "0.7rem" }}>
+                  <div style={{ color: "var(--text-3)", fontSize: "0.6rem", textTransform: "uppercase" }}>Storage Root</div>
+                  <div className="mono" style={{ color: "var(--text-1)", fontSize: "0.65rem" }}>{l.storageRoot ? sh(l.storageRoot, 6) : "—"}</div>
+                </div>
+                <div style={{ padding: "5px 8px", background: "var(--bg-2)", borderRadius: "var(--radius-sm)", fontSize: "0.7rem" }}>
+                  <div style={{ color: "var(--text-3)", fontSize: "0.6rem", textTransform: "uppercase" }}>Created</div>
+                  <div style={{ color: "var(--text-1)" }}>{fmtDate(l.createdAt)}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {l.seller.toLowerCase() === (userWallet || "").toLowerCase() ? (
+                  <Btn variant="secondary" onClick={() => doDelist(l.tokenId)} disabled={acting !== null} style={{ flex: 1, fontSize: "0.75rem" }}>
+                    {acting === `delist-${l.tokenId}` ? "Delisting..." : "Delist"}
+                  </Btn>
+                ) : (
+                  <Btn onClick={() => doBuy(l.tokenId)} disabled={acting !== null} style={{ flex: 1, fontSize: "0.75rem" }}>
+                    {acting === `buy-${l.tokenId}` ? "Buying..." : `Buy for ${l.price} 0G`}
+                  </Btn>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+/* ══════════════════════════════════════════════
+   PRIVACY
+   ══════════════════════════════════════════════ */
+function PrivacyTab() {
+  const layers = [
+    {
+      title: "Encrypted Agent Config",
+      status: "AES-256-GCM",
+      desc: "System prompts are encrypted with AES-256-GCM before being stored on-chain. The encryption key is derived from the owner's private key + agent token ID. Plaintext never touches the blockchain — only the owner can decrypt their agent's personality.",
+      detail: "Key derivation: SHA-256(privateKey + ':agent:' + tokenId) → 256-bit key. Format: base64(IV‖AuthTag‖Ciphertext). 12-byte IV, 16-byte auth tag, authenticated encryption.",
+      variant: "green" as const,
+    },
+    {
+      title: "TEE-Verified Inference",
+      status: "Sealed Inference",
+      desc: "All agent inference runs inside a Trusted Execution Environment (TEE) via 0G Compute. The model processes prompts inside a hardware enclave — neither the compute provider nor any third party can observe the input or output.",
+      detail: "0G Compute broker negotiates TEE attestation. Each response includes a verifiable Chat ID. The broker's processResponse() validates the TEE signature chain. Proof cards shown on every message.",
+      variant: "blue" as const,
+    },
+    {
+      title: "On-Chain Access Control",
+      status: "ownerOf()",
+      desc: "Smart contracts enforce that only the INFT owner can update memory roots, clone agents, or modify config. The ownerOf() check is on-chain and immutable — no admin backdoor, no server override.",
+      detail: "MindVaultINFT.updateMemory() → require(ownerOf(tokenId) == msg.sender). MemoryRegistry.recordSnapshot() → require(writers[agentId] == msg.sender). Clone requires ownership of the original.",
+      variant: "amber" as const,
+    },
+    {
+      title: "Merkle-Verified Storage",
+      status: "0G Storage",
+      desc: "Memories are serialized as JSON, Merkle-treed, and uploaded to 0G's decentralized storage network. The root hash is stored on-chain. Anyone can verify data integrity by downloading and recomputing the Merkle root.",
+      detail: "Upload: JSON → TextEncoder → MemData → merkleTree() → indexer.upload(). Verify: download by rootHash → parse JSON → compare memory count. Tamper-evident by construction.",
+      variant: "default" as const,
+    },
+    {
+      title: "Memory Privacy Boundary",
+      status: "Owner-Only",
+      desc: "Memory content is stored on 0G Storage (content-addressed, not publicly indexed). The storage root hash is on-chain, but accessing the actual memory data requires knowing the root hash. Only the INFT owner's UI loads and displays memories.",
+      detail: "Storage roots are public (on-chain), but memory content requires an explicit download call with the root hash. Future: encrypt memory payloads with owner key for full confidentiality.",
+      variant: "green" as const,
+    },
+  ];
+
+  return (
+    <div className="fade-in">
+      <Card style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ width: 44, height: 44, borderRadius: "var(--radius)", background: "linear-gradient(135deg, #7c3aed, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-0)" }}>Privacy & Security Model</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--text-2)", marginTop: 3, lineHeight: 1.5 }}>Five layers of privacy protection — from encrypted configs to TEE-verified inference to on-chain access control.</div>
+        </div>
+        <Badge variant="blue">5 Layers</Badge>
+      </Card>
+
+      {/* Privacy flow diagram */}
+      <SectionLabel>Data Privacy Flow</SectionLabel>
+      <Card style={{ marginBottom: 24, padding: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 28px 1fr 28px 1fr 28px 1fr", alignItems: "center", textAlign: "center", fontSize: "0.75rem" }}>
+          {[
+            { label: "Plaintext Config", sub: "Browser only", bg: "var(--bg-2)" },
+            null,
+            { label: "AES-256-GCM", sub: "Encrypt before tx", bg: "var(--accent-dim)", border: "var(--accent-border)" },
+            null,
+            { label: "On-Chain", sub: "Ciphertext only", bg: "var(--bg-2)" },
+            null,
+            { label: "TEE Enclave", sub: "Sealed inference", bg: "var(--blue-dim)", border: "rgba(96,165,250,0.15)" },
+          ].map((item, i) => item ? (
+            <div key={i} style={{ padding: 12, background: item.bg, borderRadius: "var(--radius)", border: `1px solid ${item.border || "var(--border)"}` }}>
+              <div style={{ fontWeight: 600, color: "var(--text-0)", fontSize: "0.75rem" }}>{item.label}</div>
+              <div style={{ color: "var(--text-3)", marginTop: 2, fontSize: "0.65rem" }}>{item.sub}</div>
+            </div>
+          ) : (
+            <div key={i} style={{ color: "var(--text-3)", fontSize: "0.8rem" }}>→</div>
+          ))}
+        </div>
+      </Card>
+
+      <SectionLabel>Security Layers</SectionLabel>
+      <div style={{ display: "grid", gap: 12 }}>
+        {layers.map((layer, i) => (
+          <Card key={i} className="slide-up" style={{ animationDelay: `${i * 60}ms`, padding: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-0)" }}>{layer.title}</span>
+              <Badge variant={layer.variant}>{layer.status}</Badge>
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "var(--text-2)", lineHeight: 1.6, marginBottom: 8 }}>{layer.desc}</div>
+            <div style={{ padding: "8px 10px", background: "var(--bg-2)", borderRadius: "var(--radius-sm)", fontFamily: "var(--mono)", fontSize: "0.68rem", color: "var(--text-3)", lineHeight: 1.6 }}>{layer.detail}</div>
+          </Card>
+        ))}
+      </div>
+
+      <SectionLabel>Threat Model</SectionLabel>
+      <Card>
+        <div style={{ display: "grid", gap: 8 }}>
+          {[
+            { threat: "Compute provider reads prompts/responses", mitigation: "TEE enclave — provider cannot observe plaintext inside the enclave", status: "Mitigated" },
+            { threat: "On-chain observer reads agent personality", mitigation: "AES-256-GCM encryption — ciphertext only on-chain", status: "Mitigated" },
+            { threat: "Unauthorized memory update", mitigation: "ownerOf() check in smart contract — only token owner can write", status: "Mitigated" },
+            { threat: "Memory data tampering in storage", mitigation: "Merkle proof verification — any modification changes the root hash", status: "Mitigated" },
+            { threat: "Memory content visible via storage root", mitigation: "Root hash is public, content requires explicit download. Future: encrypted payloads", status: "Partial" },
+          ].map((t, i) => (
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 12, padding: "8px 10px", background: "var(--bg-2)", borderRadius: "var(--radius-sm)", fontSize: "0.75rem", alignItems: "center" }}>
+              <div style={{ color: "var(--text-1)" }}>{t.threat}</div>
+              <div style={{ color: "var(--text-2)" }}>{t.mitigation}</div>
+              <Badge variant={t.status === "Mitigated" ? "green" : "amber"}>{t.status}</Badge>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+
+/* ══════════════════════════════════════════════
    MAIN
    ══════════════════════════════════════════════ */
 export default function Home() {
-  const [tab, setTab] = useState<"dashboard" | "chat" | "openclaw" | "arch">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "chat" | "marketplace" | "openclaw" | "privacy" | "arch">("dashboard");
   const [agents, setAgents] = useState<AgentData[]>([]);
   const [balance, setBalance] = useState("0");
   const [wallet, setWallet] = useState("");
@@ -919,7 +1215,9 @@ export default function Home() {
   const tabs = [
     { id: "dashboard" as const, label: "Dashboard" },
     { id: "chat" as const, label: "Chat" },
+    { id: "marketplace" as const, label: "Marketplace" },
     { id: "openclaw" as const, label: "OpenClaw" },
+    { id: "privacy" as const, label: "Privacy" },
     { id: "arch" as const, label: "Architecture" },
   ];
 
@@ -974,7 +1272,9 @@ export default function Home() {
         <>
           {tab === "dashboard" && <DashboardTab agents={agents} balance={balance} wallet={wallet} onRefresh={load} onMint={mint} minting={minting} addToast={addToast} userWallet={userWallet} network={network} net={net} />}
           {tab === "chat" && <ChatTab agents={agents} addToast={addToast} network={network} net={net} />}
+          {tab === "marketplace" && <MarketplaceTab agents={agents} addToast={addToast} userWallet={userWallet} onRefresh={load} />}
           {tab === "openclaw" && <OpenClawTab />}
+          {tab === "privacy" && <PrivacyTab />}
           {tab === "arch" && <ArchTab />}
         </>
       )}

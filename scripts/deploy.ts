@@ -39,14 +39,24 @@ async function main() {
     "./artifacts/contracts/src/MemoryRegistry.sol/MemoryRegistry.json"
   );
 
+  // Deploy marketplace with INFT address as constructor arg
+  const marketArtifact = JSON.parse(fs.readFileSync("./artifacts/contracts/src/AgentMarketplace.sol/AgentMarketplace.json", "utf-8"));
+  const marketFactory = new ethers.ContractFactory(marketArtifact.abi, marketArtifact.bytecode, wallet);
+  const market = await marketFactory.deploy(inftAddr);
+  await market.waitForDeployment();
+  const marketAddr = await market.getAddress();
+  console.log(`✅ AgentMarketplace deployed: ${marketAddr}`);
+
   console.log(`\n📋 Add to .env:`);
   console.log(`INFT_CONTRACT_ADDRESS=${inftAddr}`);
   console.log(`MEMORY_REGISTRY_ADDRESS=${registryAddr}`);
+  console.log(`MARKETPLACE_ADDRESS=${marketAddr}`);
   const isMainnet = RPC_URL.includes("evmrpc.0g.ai") && !RPC_URL.includes("testnet");
   const explorer = isMainnet ? "https://chainscan.0g.ai" : "https://chainscan-galileo.0g.ai";
   console.log(`\n🔍 Verify on explorer:`);
   console.log(`${explorer}/address/${inftAddr}`);
   console.log(`${explorer}/address/${registryAddr}`);
+  console.log(`${explorer}/address/${marketAddr}`);
 }
 
 main().catch(console.error);
