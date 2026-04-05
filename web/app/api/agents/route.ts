@@ -5,9 +5,17 @@ import { resolveNetwork, getNetworkFromRequest } from "../../../lib/server-netwo
 
 const PK = process.env.PRIVATE_KEY || "";
 
-const INFT_ABI = [
+const INFT_ABI_NEW = [
   "function mintAgent(string name, string encryptedConfig) returns (uint256)",
   "function getAgent(uint256) view returns (string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt)",
+  "function totalAgents() view returns (uint256)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
+  "event AgentMinted(uint256 indexed tokenId, address indexed owner, string name)",
+];
+
+const INFT_ABI_OLD = [
+  "function mintAgent(string name, string encryptedConfig) returns (uint256)",
+  "function getAgent(uint256) view returns (tuple(string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt))",
   "function totalAgents() view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "event AgentMinted(uint256 indexed tokenId, address indexed owner, string name)",
@@ -27,9 +35,21 @@ function tryDecrypt(encrypted: string, agentId: number): string {
 export async function GET(req: Request) {
   try {
     const net = resolveNetwork(getNetworkFromRequest(req.url));
-    const inft = new ethers.Contract(net.inftAddress, INFT_ABI, net.provider);
+    // Try new ABI first (mainnet), fall back to old (testnet)
+    let inft = new ethers.Contract(net.inftAddress, INFT_ABI_NEW, net.provider);
     const registry = new ethers.Contract(net.registryAddress, REG_ABI, net.provider);
     const total = Number(await inft.totalAgents());
+
+    // Detect which ABI works by trying agent 0
+    let useOldAbi = false;
+    if (total > 0) {
+      try {
+        await inft.getAgent(0);
+      } catch {
+        useOldAbi = true;
+        inft = new ethers.Contract(net.inftAddress, INFT_ABI_OLD, net.provider);
+      }
+    }
 
     const agentPromises = Array.from({ length: total }, (_, i) => (async () => {
       try {
@@ -65,7 +85,7 @@ export async function POST(req: Request) {
   try {
     const { name, systemPrompt, network: networkId } = await req.json();
     const net = resolveNetwork(networkId);
-    const inft = new ethers.Contract(net.inftAddress, INFT_ABI, net.signer);
+    const inft = new ethers.Contract(net.inftAddress, INFT_ABI_NEW, net.signer);
 
     const nextId = Number(await inft.totalAgents());
     const prompt = systemPrompt || "You are a helpful AI with persistent memory.";
