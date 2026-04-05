@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const { messages, providerAddress, network: reqNetwork } = await req.json();
 
     // Try requested network first, fall back to testnet if mainnet compute isn't funded
-    let network = reqNetwork || "testnet";
+    const network = reqNetwork || "testnet";
     let broker = await getBroker(network);
     let lastError = "";
 
