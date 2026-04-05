@@ -4,9 +4,25 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/// @title MindVault Agent INFT — ERC-7857 compatible Intelligent NFT
+/// @title IERC7857 — Intelligent NFT interface (clone + metadata)
+/// @dev Minimal interface for ERC-7857 compatibility
+interface IERC7857 {
+    function cloneAgent(uint256 originalId) external returns (uint256);
+    function getAgent(uint256 tokenId) external view returns (
+        string memory name,
+        string memory storageRoot,
+        string memory kvStreamId,
+        string memory encryptedConfig,
+        uint256 createdAt,
+        uint256 updatedAt
+    );
+    event AgentCloned(uint256 indexed originalId, uint256 indexed cloneId, address indexed newOwner);
+}
+
+/// @title MindVault Agent INFT — ERC-7857 Intelligent NFT
 /// @notice Each token represents an AI agent with encrypted persistent memory on 0G Storage
-contract MindVaultINFT is ERC721, Ownable {
+/// @dev Implements IERC7857 for clone semantics + ERC721 for ownership/transfer
+contract MindVaultINFT is ERC721, Ownable, IERC7857 {
     uint256 private _nextTokenId;
 
     struct AgentMetadata {
@@ -22,7 +38,6 @@ contract MindVaultINFT is ERC721, Ownable {
 
     event AgentMinted(uint256 indexed tokenId, address indexed owner, string name);
     event MemoryUpdated(uint256 indexed tokenId, string storageRoot, string kvStreamId);
-    event AgentCloned(uint256 indexed originalId, uint256 indexed cloneId, address indexed newOwner);
 
     constructor() ERC721("MindVault Agent", "MVAGENT") Ownable(msg.sender) {}
 
@@ -76,14 +91,27 @@ contract MindVaultINFT is ERC721, Ownable {
         return cloneId;
     }
 
-    /// @notice Get full agent metadata
-    function getAgent(uint256 tokenId) external view returns (AgentMetadata memory) {
+    /// @notice Get full agent metadata (IERC7857)
+    function getAgent(uint256 tokenId) external view returns (
+        string memory name,
+        string memory storageRoot,
+        string memory kvStreamId,
+        string memory encryptedConfig,
+        uint256 createdAt,
+        uint256 updatedAt
+    ) {
         require(tokenId < _nextTokenId, "Agent does not exist");
-        return agents[tokenId];
+        AgentMetadata memory a = agents[tokenId];
+        return (a.name, a.storageRoot, a.kvStreamId, a.encryptedConfig, a.createdAt, a.updatedAt);
     }
 
     /// @notice Total agents minted
     function totalAgents() external view returns (uint256) {
         return _nextTokenId;
+    }
+
+    /// @notice ERC-165 interface detection
+    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+        return interfaceId == type(IERC7857).interfaceId || super.supportsInterface(interfaceId);
     }
 }

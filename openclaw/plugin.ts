@@ -167,12 +167,67 @@ export const tools = {
   },
 };
 
+// --- In-memory session buffer for auto-persist ---
+
+const sessionMemories: Map<string, unknown[]> = new Map();
+
+export function bufferMemory(sessionKey: string, memory: unknown) {
+  const existing = sessionMemories.get(sessionKey) || [];
+  existing.push(memory);
+  sessionMemories.set(sessionKey, existing);
+}
+
+export function getSessionMemories(sessionKey: string): unknown[] {
+  return sessionMemories.get(sessionKey) || [];
+}
+
 // --- OpenClaw Plugin Hooks ---
 
-// Auto-save conversation context after each agent session ends
 export const hooks: PluginHooks = {
+  after_tool_call: async (ctx, call, result) => {
+    // Buffer memories from tool calls during the session
+    if (call.name === "mindvault_store_memory" && !result.isError && ctx.sessionKey) {
+      const input = call.input as { memories?: unknown[] };
+      if (input.memories) {
+        for (const m of input.memories) bufferMemory(ctx.sessionKey, m);
+      }
+    }
+  },
+
   agent_end: async (ctx) => {
-    console.log(`[MindVault] Session ${ctx.sessionKey} ended — memory checkpoint available`);
+    const key = ctx.sessionKey || "default";
+    const memories = getSessionMemories(key);
+
+    if (memories.length === 0) {
+      console.log(`[MindVault] Session ${key} ended — no new memories to persist`);
+      return;
+    }
+
+    // Auto-persist buffered memories to 0G Storage
+    const agentId = ctx.agentId ? parseInt(ctx.agentId, 10) : 0;
+    console.log(`[MindVault] Session ${key} ended — auto-persisting ${memories.length} memories for agent #${agentId}`);
+
+    try {
+      const { rootHash } = await uploadToStorage(memories);
+
+      // Update on-chain pointers
+      const signer = getSigner();
+      const inft = new ethers.Contract(INFT_ADDRESS, INFT_ABI, signer);
+      await (await inft.updateMemory(agentId, rootHash, "")).wait();
+
+      const registry = new ethers.Contract(REGISTRY_ADDRESS, REGISTRY_ABI, signer);
+      try {
+        await (await registry.recordSnapshot(agentId, rootHash, memories.length)).wait();
+      } catch {
+        // Writer may not be set — non-critical
+      }
+
+      console.log(`[MindVault] Auto-persisted ${memories.length} memories — root: ${rootHash}`);
+    } catch (e) {
+      console.error(`[MindVault] Auto-persist failed: ${e instanceof Error ? e.message : e}`);
+    } finally {
+      sessionMemories.delete(key);
+    }
   },
 };
 

@@ -5,10 +5,10 @@ import "dotenv/config";
 const RPC_URL = process.env.RPC_URL!;
 const INDEXER_RPC = process.env.STORAGE_INDEXER_RPC!;
 const PRIVATE_KEY = process.env.PRIVATE_KEY!;
+const MAX_RETRIES = 2;
 
 function getSigner() {
-  const provider = new ethers.JsonRpcProvider(RPC_URL);
-  return new ethers.Wallet(PRIVATE_KEY, provider);
+  return new ethers.Wallet(PRIVATE_KEY, new ethers.JsonRpcProvider(RPC_URL));
 }
 
 function getIndexer() {
@@ -24,43 +24,62 @@ export interface Memory {
   metadata?: Record<string, string>;
 }
 
-/// Upload a memory batch to 0G Storage as a JSON file
+async function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
+
 export async function uploadMemories(memories: Memory[]): Promise<{ rootHash: string; txHash: string }> {
   const data = new TextEncoder().encode(JSON.stringify(memories, null, 2));
   const memData = new MemData(data);
-  const [tree, treeErr] = await memData.merkleTree();
+  const [, treeErr] = await memData.merkleTree();
   if (treeErr) throw new Error(`Merkle tree error: ${treeErr}`);
 
-  const indexer = getIndexer();
-  const signer = getSigner();
-  const [tx, err] = await indexer.upload(memData, RPC_URL, signer);
-  if (err) throw new Error(`Upload error: ${err}`);
-
-  const result = tx as { rootHash: string; txHash: string };
-  console.log(`✅ Memories uploaded — root: ${result.rootHash}, tx: ${result.txHash}`);
-  return result;
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        console.log(`[Storage] Upload retry ${attempt}/${MAX_RETRIES}...`);
+        await sleep(3000 * attempt);
+      }
+      const indexer = getIndexer();
+      const [tx, err] = await indexer.upload(memData, RPC_URL, getSigner());
+      if (err) throw new Error(`Upload error: ${err}`);
+      const result = tx as { rootHash: string; txHash: string };
+      console.log(`✅ Memories uploaded — root: ${result.rootHash}, tx: ${result.txHash}`);
+      return result;
+    } catch (e) {
+      lastError = e instanceof Error ? e : new Error(String(e));
+    }
+  }
+  throw new Error(`Storage upload failed after ${MAX_RETRIES + 1} attempts: ${lastError?.message}`);
 }
 
-/// Download memories from 0G Storage by root hash
 export async function downloadMemories(rootHash: string, outputPath: string): Promise<Memory[]> {
-  const indexer = getIndexer();
-  const err = await indexer.download(rootHash, outputPath, true);
-  if (err) throw new Error(`Download error: ${err}`);
-
-  const fs = await import("fs");
-  const raw = fs.readFileSync(outputPath, "utf-8");
-  return JSON.parse(raw) as Memory[];
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        console.log(`[Storage] Download retry ${attempt}/${MAX_RETRIES}...`);
+        await sleep(3000 * attempt);
+      }
+      const indexer = getIndexer();
+      const err = await indexer.download(rootHash, outputPath, true);
+      if (err) throw new Error(`Download error: ${err}`);
+      const fs = await import("fs");
+      const raw = fs.readFileSync(outputPath, "utf-8");
+      return JSON.parse(raw) as Memory[];
+    } catch (e) {
+      lastError = e instanceof Error ? e : new Error(String(e));
+    }
+  }
+  throw new Error(`Storage download failed after ${MAX_RETRIES + 1} attempts: ${lastError?.message}`);
 }
 
-/// Upload a single file (e.g., agent config, large context) to 0G Storage
 export async function uploadFile(filePath: string): Promise<{ rootHash: string; txHash: string }> {
   const file = await ZgFile.fromFilePath(filePath);
-  const [tree, treeErr] = await file.merkleTree();
+  const [, treeErr] = await file.merkleTree();
   if (treeErr) throw new Error(`Merkle tree error: ${treeErr}`);
 
   const indexer = getIndexer();
-  const signer = getSigner();
-  const [tx, err] = await indexer.upload(file, RPC_URL, signer);
+  const [tx, err] = await indexer.upload(file, RPC_URL, getSigner());
   if (err) throw new Error(`Upload error: ${err}`);
   await file.close();
 

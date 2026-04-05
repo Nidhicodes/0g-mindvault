@@ -42,9 +42,11 @@ async function main() {
   console.log(`\n📋 Add to .env:`);
   console.log(`INFT_CONTRACT_ADDRESS=${inftAddr}`);
   console.log(`MEMORY_REGISTRY_ADDRESS=${registryAddr}`);
+  const isMainnet = RPC_URL.includes("evmrpc.0g.ai") && !RPC_URL.includes("testnet");
+  const explorer = isMainnet ? "https://chainscan.0g.ai" : "https://chainscan-galileo.0g.ai";
   console.log(`\n🔍 Verify on explorer:`);
-  console.log(`https://chainscan-galileo.0g.ai/address/${inftAddr}`);
-  console.log(`https://chainscan-galileo.0g.ai/address/${registryAddr}`);
+  console.log(`${explorer}/address/${inftAddr}`);
+  console.log(`${explorer}/address/${registryAddr}`);
 }
 
 main().catch(console.error);
