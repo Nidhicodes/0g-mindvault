@@ -41,12 +41,10 @@ export async function GET(req: Request) {
     const total = Number(await inft.totalAgents());
 
     // Detect which ABI works by trying agent 0
-    let useOldAbi = false;
     if (total > 0) {
       try {
         await inft.getAgent(0);
       } catch {
-        useOldAbi = true;
         inft = new ethers.Contract(net.inftAddress, INFT_ABI_OLD, net.provider);
       }
     }
