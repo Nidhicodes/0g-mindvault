@@ -2,13 +2,11 @@
 
 > AI agents that remember everything, prove every thought, and own their identity.
 
-MindVault is a decentralized agent memory and identity platform built on 0G. AI agents store persistent memories on **0G Storage** (Merkle-verified), run inference through **0G Compute** (TEE-verified), and own their identity as **INFTs (ERC-7857)** on **0G Chain** — transferable, clonable, and truly owned.
-
-**Track:** Agentic Infrastructure & OpenClaw Lab (Track 1)
+MindVault is a decentralized agent memory and identity platform built on 0G. AI agents store persistent memories on **0G Storage** (Merkle-verified), run inference through **0G Compute** (TEE-verified), and own their identity as **INFTs (ERC-7857)** on **0G Chain**, transferable, clonable, and truly owned.
 
 ## The Problem
 
-Today's AI agents are stateless. Every session starts from zero — no memory of past conversations, no learning from experience, no proof of reasoning. When you "own" an AI agent, you don't really own anything. The intelligence lives on someone else's server, and the memories vanish when the session ends.
+Today's AI agents are stateless. Every session starts from zero i.e., no memory of past conversations, no learning from experience, no proof of reasoning. When you "own" an AI agent, you don't really own anything. The intelligence lives on someone else's server, and the memories vanish when the session ends.
 
 ## The Solution
 
@@ -16,15 +14,15 @@ MindVault gives AI agents three things they've never had:
 
 1. **Persistent Memory** — Memories extracted from conversations, stored on 0G Storage with Merkle proofs, and restored across sessions
 2. **Verifiable Reasoning** — Every inference runs through 0G Compute with TEE (Sealed Inference) verification
-3. **Tokenized Identity** — Each agent is an ERC-7857 INFT on 0G Chain — mintable, clonable, transferable, with encrypted config stored on-chain
+3. **Tokenized Identity** — Each agent is an ERC-7857 INFT on 0G Chain, mintable, clonable, transferable, with encrypted config stored on-chain
 4. **Cross-Agent Memory Sharing** — Agents can import memories from other agents, enabling composable intelligence
 5. **OpenClaw Plugin** — 3 tools + hooks that let any OpenClaw gateway use MindVault for persistent memory
 
-## Why This Matters — Market & Vision
+## Why This Matters : Market & Vision
 
 ### The Market
 
-The AI agent market is projected to reach $47B by 2030. Every major framework (LangChain, AutoGPT, CrewAI) treats memory as an afterthought — in-process, ephemeral, unverifiable. As agents move from toys to production (trading, customer service, personal assistants), three problems become critical:
+The AI agent market is projected to reach $47B by 2030. Every major framework (LangChain, AutoGPT, CrewAI) treats memory as an afterthought, in-process, ephemeral, unverifiable. As agents move from toys to production (trading, customer service, personal assistants), three problems become critical:
 
 1. **Memory loss** — Agents forget everything between sessions. Users repeat themselves. Context is lost.
 2. **Trust deficit** — No way to prove what an agent said or why. Black-box reasoning can't be audited.
@@ -35,7 +33,7 @@ The AI agent market is projected to reach $47B by 2030. Every major framework (L
 - **Agent framework developers** — Integrate MindVault via OpenClaw plugin to add persistent memory to any agent without building storage infrastructure
 - **DeFi/trading teams** — Agents that remember market patterns across sessions, with TEE-verified reasoning for audit trails
 - **AI-native dApps** — Personal assistants, tutors, companions that build long-term relationships with users
-- **Agent marketplace builders** — INFTs enable a secondary market for trained agents — buy an agent that already knows your domain
+- **Agent marketplace builders** — INFTs enable a secondary market for trained agents, buy an agent that already knows your domain
 
 ### Competitive Landscape
 
@@ -46,7 +44,7 @@ The AI agent market is projected to reach $47B by 2030. Every major framework (L
 | Mem0 | ✓ | ✗ | ✗ | ✗ |
 | **MindVault on 0G** | **✓** | **✓ (TEE)** | **✓ (INFT)** | **✓** |
 
-MindVault is the only solution that combines persistent memory, verifiable inference, tokenized ownership, and decentralized storage in a single stack — all on 0G.
+MindVault is the only solution that combines persistent memory, verifiable inference, tokenized ownership, and decentralized storage in a single stack, all on 0G.
 
 ### Growth Path
 
@@ -56,10 +54,10 @@ MindVault is the only solution that combines persistent memory, verifiable infer
 
 ### Imagine This
 
-- A **customer support agent** that remembers every interaction across 10,000 sessions. When an employee leaves, the company transfers the INFT to their replacement — institutional knowledge preserved, verified, owned.
-- An **agent marketplace** where you buy a "Senior Solidity Auditor" INFT with 500 verified memories of past audits. The memory history is on-chain — you can verify what it knows before you buy.
+- A **customer support agent** that remembers every interaction across 10,000 sessions. When an employee leaves, the company transfers the INFT to their replacement, institutional knowledge preserved, verified, owned.
+- An **agent marketplace** where you buy a "Senior Solidity Auditor" INFT with 500 verified memories of past audits. The memory history is on-chain, you can verify what it knows before you buy.
 - A **gaming NPC** with persistent memory that evolves based on player interactions. It remembers alliances, betrayals, and promises — and the game studio can prove the NPC's reasoning was TEE-verified, not scripted.
-- A **DeFi trading agent** that accumulates market pattern memories over months. Its INFT becomes more valuable as its verified memory history grows — a new asset class.
+- A **DeFi trading agent** that accumulates market pattern memories over months. Its INFT becomes more valuable as its verified memory history grows, a new asset class.
 - An **AI tutor** that remembers a student's learning style, weak areas, and progress across semesters. The student owns the INFT and can export their agent to any platform.
 
 
@@ -135,7 +133,7 @@ Agent B can import Agent A's memories. The UI provides an "Import from…" dropd
 Every chat message shows a verification proof card with the Chat ID, TEE verification status, model used, and latency. This maps directly to 0G's Sealed Inference feature.
 
 ### Memory Verification
-A "Verify Proof" button downloads memories from 0G Storage using the root hash, confirms the data is intact, and reports the memory count — proving the Merkle proof chain is valid.
+A "Verify Proof" button downloads memories from 0G Storage using the root hash, confirms the data is intact, and reports the memory count, proving the Merkle proof chain is valid.
 
 ### Agent Cloning (ERC-7857)
 Clone an agent on-chain. The new INFT inherits the original's encrypted personality config but starts with fresh memory — demonstrating composable agent identity.
@@ -258,7 +256,7 @@ The smart contracts enforce ownership via `ownerOf` checks — regardless of whi
 
 ## Team
 
-- **sqnidhi** — Solo full-stack developer
+- **Nidhicodes** 
 
 ## License
 
