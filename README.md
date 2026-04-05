@@ -23,6 +23,8 @@
 
 > MindVault is a decentralized agent memory and identity platform built on 0G. AI agents store persistent memories on **0G Storage** (Merkle-verified), run inference through **0G Compute** (TEE-verified), and own their identity as **INFTs (ERC-7857)** on **0G Chain** transferable, clonable, and truly owned.
 
+> Try it out here : <a href="https://0g-mindvault.vercel.app/">Live link</a> 
+
 ---
 
 ## The Problem
