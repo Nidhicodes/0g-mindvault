@@ -1,0 +1,57 @@
+{
+  "$schema": "https://openclaw.ai/schemas/config.json",
+  "providers": {
+    "0g-compute": {
+      "baseUrl": "https://0g-compute-provider/v1/proxy",
+      "apiKey": "on-chain-billing",
+      "api": "openai-completions",
+      "models": [
+        { "id": "qwen-2.5-7b-instruct", "name": "Qwen 2.5 7B (0G TEE Verified)" },
+        { "id": "deepseek-chat-v3", "name": "DeepSeek V3 (0G TEE Verified)" },
+        { "id": "glm-5-fp8", "name": "GLM-5 FP8 (0G TEE Verified)" }
+      ],
+      "cost": 0
+    }
+  },
+  "agents": {
+    "defaults": {
+      "models": ["0g-compute/qwen-2.5-7b-instruct"],
+      "workspace": "./agent-workspace"
+    },
+    "list": [
+      {
+        "id": "mindvault-agent",
+        "name": "MindVault Agent",
+        "workspace": "./agent-workspace",
+        "models": ["0g-compute/qwen-2.5-7b-instruct"],
+        "tools": {
+          "allow": [
+            "mindvault_store_memory",
+            "mindvault_recall_memory",
+            "mindvault_get_agent",
+            "memory_search",
+            "memory_get",
+            "web_search",
+            "web_fetch"
+          ]
+        }
+      }
+    ]
+  },
+  "plugins": {
+    "mindvault": {
+      "enabled": true,
+      "contracts": {
+        "inft": "0xcfee7588d1C396fa76d1D7f6f2BBC50153775785",
+        "registry": "0xd0565f93f450494e8373dE7f33d565E0B5b41089"
+      },
+      "storage": {
+        "indexerRpc": "https://indexer-storage-testnet-turbo.0g.ai"
+      },
+      "chain": {
+        "rpcUrl": "https://evmrpc-testnet.0g.ai",
+        "chainId": 16602
+      }
+    }
+  }
+}

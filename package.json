@@ -1,0 +1,27 @@
+{
+  "name": "0g-mindvault",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Persistent Memory & Identity Layer for Autonomous AI Agents on 0G",
+  "scripts": {
+    "agent": "npx tsx agent/index.ts",
+    "deploy": "npx hardhat compile && npx tsx scripts/deploy.ts",
+    "dev": "cd web && npm run dev",
+    "test:storage": "npx tsx storage/test.ts",
+    "test:compute": "npx tsx compute/test.ts",
+    "test:openclaw": "npx tsx openclaw/test.ts"
+  },
+  "dependencies": {
+    "@0gfoundation/0g-ts-sdk": "^1.2.1",
+    "@0glabs/0g-serving-broker": "^2.0.0",
+    "@openzeppelin/contracts": "^5.6.1",
+    "dotenv": "^16.4.0",
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}
