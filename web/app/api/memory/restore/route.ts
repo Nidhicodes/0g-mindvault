@@ -5,7 +5,7 @@ import * as fs from "fs";
 import { resolveNetwork } from "../../../../lib/server-network";
 
 const ABI = [
-  "function getAgent(uint256) view returns (tuple(string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt))",
+  "function getAgent(uint256) view returns (string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt)",
 ];
 
 export async function POST(req: Request) {

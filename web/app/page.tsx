@@ -108,8 +108,8 @@ function NeuralOrb() {
 /* ══════════════════════════════════════════════
    DASHBOARD
    ══════════════════════════════════════════════ */
-function DashboardTab({ agents, balance, wallet, onRefresh, onMint, minting, addToast, userWallet, network, net }: {
-  agents: AgentData[]; balance: string; wallet: string; onRefresh: () => void; onMint: (n: string, p: string) => void; minting: boolean; addToast: (m: string, t: "success" | "error") => void; userWallet: string | null; network: string; net: NetworkConfig;
+function DashboardTab({ agents, balance, wallet, onRefresh, onMint, minting, mintStep, addToast, userWallet, network, net }: {
+  agents: AgentData[]; balance: string; wallet: string; onRefresh: () => void; onMint: (n: string, p: string) => void; minting: boolean; mintStep: string | null; addToast: (m: string, t: "success" | "error") => void; userWallet: string | null; network: string; net: NetworkConfig;
 }) {
   const [showMint, setShowMint] = useState(false);
   const [mintName, setMintName] = useState("MindVault Agent");
@@ -168,18 +168,53 @@ function DashboardTab({ agents, balance, wallet, onRefresh, onMint, minting, add
       </div>
 
       {/* Mint Form */}
-      {showMint && (
+      {(showMint || minting) && (
         <Card className="slide-up" style={{ marginBottom: 20 }}>
           <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-0)", marginBottom: 14 }}>Mint New Agent INFT</div>
-          <input value={mintName} onChange={e => setMintName(e.target.value)} placeholder="Agent name" style={{ ...inputStyle, marginBottom: 8 }} />
-          <textarea value={mintPrompt} onChange={e => setMintPrompt(e.target.value)} placeholder="System prompt" rows={3}
-            style={{ ...inputStyle, marginBottom: 12, resize: "vertical", fontFamily: "var(--sans)" }} />
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <Btn onClick={() => { onMint(mintName, mintPrompt); setShowMint(false); }} disabled={minting}>
-              {minting ? "Minting…" : "Deploy to 0G Chain"}
-            </Btn>
-            <span style={{ fontSize: "0.7rem", color: "var(--text-3)" }}>System prompt encrypted with AES-256-GCM before on-chain storage. Only the owner&apos;s key can decrypt.</span>
-          </div>
+          {minting ? (
+            <div style={{ padding: "12px 0" }}>
+              {[
+                { label: "Encrypting agent config with AES-256-GCM", done: mintStep !== "Encrypting agent config with AES-256-GCM..." },
+                { label: "Submitting transaction to 0G Chain", done: mintStep !== "Submitting transaction to 0G Chain..." && mintStep !== "Encrypting agent config with AES-256-GCM..." && mintStep !== "Waiting for wallet signature..." },
+                { label: "Waiting for on-chain confirmation", done: mintStep === "Agent minted successfully!" },
+                { label: "Agent minted successfully", done: mintStep === "Agent minted successfully!" },
+              ].map((step, i) => {
+                const isActive = mintStep?.toLowerCase().includes(step.label.toLowerCase().slice(0, 10)) || false;
+                const isPast = step.done && !isActive;
+                return (
+                  <div key={i} className={isActive ? "fade-in" : ""} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0" }}>
+                    <div style={{
+                      width: 20, height: 20, borderRadius: "50%", flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "0.65rem", fontWeight: 600,
+                      background: isPast ? "var(--green-dim)" : isActive ? "var(--accent-dim)" : "var(--bg-2)",
+                      border: `1.5px solid ${isPast ? "var(--green)" : isActive ? "var(--accent)" : "var(--border)"}`,
+                      color: isPast ? "var(--green)" : isActive ? "var(--accent)" : "var(--text-3)",
+                    }}>
+                      {isPast ? "✓" : isActive ? <span className="typing-dots" style={{ transform: "scale(0.5)" }}><span /><span /><span /></span> : (i + 1)}
+                    </div>
+                    <span style={{
+                      fontSize: "0.8rem",
+                      color: isPast ? "var(--green)" : isActive ? "var(--text-0)" : "var(--text-3)",
+                      fontWeight: isActive ? 500 : 400,
+                    }}>{step.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              <input value={mintName} onChange={e => setMintName(e.target.value)} placeholder="Agent name" style={{ ...inputStyle, marginBottom: 8 }} />
+              <textarea value={mintPrompt} onChange={e => setMintPrompt(e.target.value)} placeholder="System prompt" rows={3}
+                style={{ ...inputStyle, marginBottom: 12, resize: "vertical", fontFamily: "var(--sans)" }} />
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <Btn onClick={() => { onMint(mintName, mintPrompt); }} disabled={minting}>
+                  Deploy to 0G Chain
+                </Btn>
+                <span style={{ fontSize: "0.7rem", color: "var(--text-3)" }}>System prompt encrypted with AES-256-GCM before on-chain storage. Only the owner&apos;s key can decrypt.</span>
+              </div>
+            </>
+          )}
         </Card>
       )}
 
@@ -1158,6 +1193,7 @@ export default function Home() {
   const [wallet, setWallet] = useState("");
   const [loading, setLoading] = useState(true);
   const [minting, setMinting] = useState(false);
+  const [mintStep, setMintStep] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [userWallet, setUserWallet] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
@@ -1197,19 +1233,27 @@ export default function Home() {
     setMinting(true);
     try {
       if (userWallet) {
-        // Mint via user's wallet — true ownership
+        setMintStep("Encrypting agent config with AES-256-GCM...");
+        await new Promise(r => setTimeout(r, 300));
+        setMintStep("Waiting for wallet signature...");
         const result = await mintAgentWithWallet(name, prompt);
+        setMintStep("Confirming on 0G Chain...");
         addToast(`Agent minted via your wallet — Token #${result.tokenId}`, "success");
       } else {
-        // Fallback: server-side mint
+        setMintStep("Encrypting agent config with AES-256-GCM...");
+        await new Promise(r => setTimeout(r, 300));
+        setMintStep("Submitting transaction to 0G Chain...");
         const res = await fetch("/api/agents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, systemPrompt: prompt, network }) });
+        setMintStep("Waiting for on-chain confirmation...");
         const data = await res.json();
         if (data.error) throw new Error(data.error);
+        setMintStep("Agent minted successfully!");
         addToast(`Agent minted (server wallet) — Token #${data.tokenId}`, "success");
       }
+      await new Promise(r => setTimeout(r, 500));
       load();
     } catch (e: unknown) { addToast(e instanceof Error ? e.message : "Mint failed", "error"); }
-    finally { setMinting(false); }
+    finally { setMinting(false); setMintStep(null); }
   };
 
   const tabs = [
@@ -1270,7 +1314,7 @@ export default function Home() {
         </div>
       ) : (
         <>
-          {tab === "dashboard" && <DashboardTab agents={agents} balance={balance} wallet={wallet} onRefresh={load} onMint={mint} minting={minting} addToast={addToast} userWallet={userWallet} network={network} net={net} />}
+          {tab === "dashboard" && <DashboardTab agents={agents} balance={balance} wallet={wallet} onRefresh={load} onMint={mint} minting={minting} mintStep={mintStep} addToast={addToast} userWallet={userWallet} network={network} net={net} />}
           {tab === "chat" && <ChatTab agents={agents} addToast={addToast} network={network} net={net} />}
           {tab === "marketplace" && <MarketplaceTab agents={agents} addToast={addToast} userWallet={userWallet} onRefresh={load} />}
           {tab === "openclaw" && <OpenClawTab />}

@@ -10,7 +10,7 @@ export const STORAGE_SCAN_URL = "https://storagescan-galileo.0g.ai";
 
 export const INFT_ABI = [
   "function mintAgent(string name, string encryptedConfig) returns (uint256)",
-  "function getAgent(uint256) view returns (tuple(string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt))",
+  "function getAgent(uint256) view returns (string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt)",
   "function updateMemory(uint256 tokenId, string storageRoot, string kvStreamId)",
   "function totalAgents() view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",

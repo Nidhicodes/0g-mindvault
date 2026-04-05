@@ -7,7 +7,7 @@ const PK = process.env.PRIVATE_KEY || "";
 
 const INFT_ABI = [
   "function mintAgent(string name, string encryptedConfig) returns (uint256)",
-  "function getAgent(uint256) view returns (tuple(string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt))",
+  "function getAgent(uint256) view returns (string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt)",
   "function totalAgents() view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "event AgentMinted(uint256 indexed tokenId, address indexed owner, string name)",

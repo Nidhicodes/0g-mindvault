@@ -7,7 +7,7 @@ const INFT = process.env.INFT_CONTRACT_ADDRESS || "";
 const MARKET = process.env.MARKETPLACE_ADDRESS || "";
 
 const INFT_ABI = [
-  "function getAgent(uint256) view returns (tuple(string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt))",
+  "function getAgent(uint256) view returns (string name, string storageRoot, string kvStreamId, string encryptedConfig, uint256 createdAt, uint256 updatedAt)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function approve(address to, uint256 tokenId)",
   "function getApproved(uint256 tokenId) view returns (address)",
