@@ -43,7 +43,7 @@ export async function connectWallet(): Promise<{ address: string; chainId: numbe
 export async function getWalletSigner() {
   const { ethers } = await import("ethers");
   const eth = (window as unknown as { ethereum: object }).ethereum;
-  const provider = new ethers.BrowserProvider(eth);
+  const provider = new ethers.BrowserProvider(eth as { request: (...args: unknown[]) => Promise<unknown> });
   return provider.getSigner();
 }
 
