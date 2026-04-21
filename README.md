@@ -387,12 +387,14 @@ The AI agent market is projected to reach **$47B by 2030**. Every major framewor
 
 ### Competitive Landscape
 
-| Approach | Memory | Verifiable | Owned | Decentralized | Composable |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| ChatGPT Memory | Yes | No | No | No | No |
-| LangChain + Pinecone | Yes | No | No | No | No |
-| Mem0 | Yes | No | No | No | No |
-| **MindVault on 0G** | **Yes** | **Yes (TEE)** | **Yes (INFT)** | **Yes** | **Yes** |
+| Approach | Persistent | Verifiable | You Own It | Decentralized | Tradeable | Cross-Agent |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| ChatGPT Memory | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| LangChain + Pinecone | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Mem0 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| SealedMind | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Synapse (0G) | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **MindVault on 0G** | ✅ | ✅ **(TEE)** | ✅ **(INFT)** | ✅ | ✅ | ✅ |
 
 ### Growth Path
 
